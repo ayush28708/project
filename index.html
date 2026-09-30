@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPORETS LIVE - Watch Live Sports, Real-Time Scorecards & Ball-by-Ball Commentary</title>
+  <meta name="description" content="Watch live sports streaming, ball-by-ball cricket commentary, football live scores, NBA box scores, tennis Grand Slams, and F1 telemetries with Sporets Live.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="css/sporets.css">
+  <link rel="stylesheet" href="css/annoying.css">
+</head>
+<body id="app-body">
+
+  <!-- Ambient Stadium Glow Effects -->
+  <div class="ambient-glow-mesh"></div>
+
+  <div id="app-root">
+    <!-- Top Navigation & Brand Header -->
+    <header class="sporets-topbar">
+      <div class="brand-wrapper" onclick="window.sporetsApp.filterBySport('all')">
+        <div class="brand-icon-box">⚡</div>
+        <div class="brand-title-wrap">
+          <div class="brand-name">
+            SPORETS
+            <span class="brand-live-badge">LIVE TV</span>
+          </div>
+          <span class="brand-sub">Universal Sports Streaming & Live Scorecard Hub</span>
+        </div>
+      </div>
+
+      <!-- Global Search -->
+      <div class="header-search-wrap">
+        <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="global-search-input" placeholder="Search live matches, teams, tournaments, or players (e.g. India, Real Madrid, LeBron)..." autocomplete="off">
+      </div>
+
+      <!-- Header Right Controls -->
+      <div class="header-actions-right">
+        <button class="top-action-btn" id="sound-toggle-btn" title="Master Audio FX Toggle">
+          🔊
+        </button>
+        <button class="top-action-btn" onclick="window.sporetsApp.filterByStatus('live')">
+          <span class="pulse-dot"></span>
+          <span>5 Live Now</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Live Matches Scrolling Ticker -->
+    <section class="live-ticker-bar" aria-label="Live Match Scores Ticker">
+      <div class="ticker-label-static">
+        <span class="pulse-dot"></span>
+        <span>LIVE SCORES</span>
+      </div>
+      <div class="ticker-scroll-container" id="live-ticker-track">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- Sports Category & Status Navigation -->
+    <nav class="sports-nav-strip" aria-label="Sports Filter Navigation">
+      <div class="sports-categories-group" id="sports-categories-nav">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <div class="status-filters-group">
+        <button class="status-filter-btn active" data-status="all" onclick="window.sporetsApp.filterByStatus('all')">All</button>
+        <button class="status-filter-btn" data-status="live" onclick="window.sporetsApp.filterByStatus('live')">🔴 Live Now</button>
+        <button class="status-filter-btn" data-status="upcoming" onclick="window.sporetsApp.filterByStatus('upcoming')">⏰ Upcoming</button>
+        <button class="status-filter-btn" data-status="finished" onclick="window.sporetsApp.filterByStatus('finished')">✅ Results</button>
+      </div>
+    </nav>
+
+    <!-- Main Dynamic Dual Pane Grid -->
+    <main class="sporets-main-grid">
+      <!-- Left / Main Content Stage (Broadcast + Scorecards + Commentary) -->
+      <section class="stage-column" aria-label="Main Match Center">
+        <div class="broadcast-stage-card">
+          <!-- Video Stream & Radar Arena -->
+          <div class="video-screen-wrapper" id="player-wrapper">
+            <!-- Mode 1: Video Player -->
+            <div id="video-screen" style="width:100%;height:100%;">
+              <video id="broadcast-video" loop muted autoplay playsinline></video>
+            </div>
+
+            <!-- Mode 2: 2D Pitch Radar Canvas -->
+            <div id="radar-screen">
+              <canvas id="radar-canvas"></canvas>
+            </div>
+
+            <!-- Mode 3: Radio Commentary Audio Screen -->
+            <div id="audio-screen">
+              <div class="audio-pulse-ring">🎙️</div>
+              <h3 style="color:#fff;font-family:var(--font-display);font-size:18px;">Live Stadium Radio Broadcast</h3>
+              <p style="color:var(--accent-cyan);font-size:13px;font-family:var(--font-mono);">Broadcasting Live Crowd & Field Audio</p>
+            </div>
+
+            <!-- Floating Reactions Layer -->
+            <div id="floating-reactions-layer"></div>
+
+            <!-- Top Broadcast Overlay Info -->
+            <div class="player-top-overlay">
+              <div class="player-info-left">
+                <div class="live-indicator-pill">
+                  <span class="pulse-dot"></span>
+                  <span>LIVE</span>
+                </div>
+                <div class="player-score-bug-card" id="player-score-bug">
+                  <!-- Match score bug -->
+                </div>
+              </div>
+
+              <div class="player-top-right">
+                <div class="viewers-badge">
+                  <span>👥</span>
+                  <span id="player-viewers-count">2.4M Watching</span>
+                </div>
+                <div class="quality-badge" id="stream-quality-badge">4K Ultra HDR</div>
+              </div>
+            </div>
+
+            <!-- Bottom Custom Control Bar -->
+            <div class="player-bottom-controls-bar">
+              <div class="controls-left">
+                <button class="player-icon-btn" id="player-play-btn" onclick="window.sportsPlayer.togglePlayPause()" title="Play/Pause">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+
+                <div class="volume-slider-wrap">
+                  <button class="player-icon-btn" id="player-mute-btn" onclick="window.sportsPlayer.toggleMute()" title="Mute/Unmute">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                  </button>
+                  <input type="range" class="volume-range-input" min="0" max="1" step="0.05" value="0.8" oninput="window.sportsPlayer.setVolume(this.value)">
+                </div>
+
+                <select class="server-selector-dropdown" id="stream-server-select" onchange="window.sportsPlayer.switchServer(this.value)">
+                  <!-- Dynamic servers -->
+                </select>
+              </div>
+
+              <div class="controls-right">
+                <button class="player-icon-btn" onclick="window.sportsPlayer.togglePiP()" title="Picture in Picture">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><rect x="12" y="9" width="8" height="6" rx="1" fill="currentColor"></rect></svg>
+                </button>
+                <button class="player-icon-btn" onclick="window.sportsPlayer.toggleTheaterMode()" title="Theater Mode">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="8" y1="4" x2="8" y2="20"></line></svg>
+                </button>
+                <button class="player-icon-btn" onclick="window.sportsPlayer.toggleFullscreen()" title="Fullscreen">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stream Mode Switcher & Floating Live Emojis Strip -->
+          <div class="player-reactions-strip">
+            <div class="mode-switches-group">
+              <button class="mode-switch-btn active" data-mode="video" onclick="window.sportsPlayer.switchMode('video')">📺 Live Broadcast</button>
+              <button class="mode-switch-btn" data-mode="radar" onclick="window.sportsPlayer.switchMode('radar')">📡 2D Tactical Radar</button>
+              <button class="mode-switch-btn" data-mode="audio" onclick="window.sportsPlayer.switchMode('audio')">📻 Audio Broadcast</button>
+            </div>
+
+            <div class="reactions-buttons-group">
+              <span style="font-size:11px;color:var(--text-dim);font-weight:700;">REACT:</span>
+              <button class="reaction-pill-btn" data-emoji="🔥" title="Fire">🔥</button>
+              <button class="reaction-pill-btn" data-emoji="🏏" title="Cricket">🏏</button>
+              <button class="reaction-pill-btn" data-emoji="⚽" title="Goal">⚽</button>
+              <button class="reaction-pill-btn" data-emoji="👏" title="Cheer">👏</button>
+              <button class="reaction-pill-btn" data-emoji="🏆" title="Trophy">🏆</button>
+              <button class="reaction-pill-btn" data-emoji="😱" title="Shock">😱</button>
+            </div>
+          </div>
+
+          <!-- Match Hero Meta Details Bar -->
+          <div class="match-hero-meta-bar">
+            <div class="match-hero-main">
+              <div>
+                <span class="match-tournament-label" id="match-header-tournament">ICC T20 World Cup</span>
+                <h1 class="match-main-heading" id="match-header-title">India vs Australia</h1>
+                <span class="match-venue-label" id="match-header-venue">📍 Melbourne Cricket Ground</span>
+              </div>
+            </div>
+            <div class="match-status-banner">
+              <span class="pulse-dot"></span>
+              <span id="match-status-banner-text">Loading match summary...</span>
+            </div>
+          </div>
+
+          <!-- Match Center Navigation Tabs -->
+          <div class="match-center-tabs-strip">
+            <button class="match-tab-btn active" data-tab="commentary" onclick="window.sporetsApp.switchTab('commentary')">
+              🎙️ Live Commentary & Events
+            </button>
+            <button class="match-tab-btn" data-tab="scorecard" onclick="window.sporetsApp.switchTab('scorecard')">
+              📊 Full Scorecard & Stats
+            </button>
+            <button class="match-tab-btn" data-tab="lineups" onclick="window.sporetsApp.switchTab('lineups')">
+              👥 Playing XI & Lineups
+            </button>
+            <button class="match-tab-btn" data-tab="h2h" onclick="window.sporetsApp.switchTab('h2h')">
+              📈 Win Predictor & Form
+            </button>
+          </div>
+
+          <!-- Dynamic Tab Content Views -->
+          <div class="tab-content-area">
+            <!-- 1. Live Commentary View -->
+            <div id="tab-view-commentary" class="match-tab-pane">
+              <div class="commentary-toolbar">
+                <div class="comm-filters-group">
+                  <button class="comm-filter-btn active" data-filter="all" onclick="window.commentaryManager.setFilter('all')">All Balls</button>
+                  <button class="comm-filter-btn" data-filter="boundaries" onclick="window.commentaryManager.setFilter('boundaries')">Boundaries & Goals</button>
+                  <button class="comm-filter-btn" data-filter="wickets" onclick="window.commentaryManager.setFilter('wickets')">Wickets & Cards</button>
+                </div>
+                <div class="comm-actions-group">
+                  <button class="comm-action-toggle" id="toggle-speech-narrate-btn" title="Voice Commentator (Audio Narration)">
+                    🎙️ Radio Narration: OFF
+                  </button>
+                  <button class="comm-action-toggle active" id="toggle-sim-btn" onclick="window.commentaryManager.toggleSimulation()" title="Real-Time Updates">
+                    <span class="pulse-dot"></span> Live Sync: ON
+                  </button>
+                </div>
+              </div>
+
+              <!-- Commentary Feed Container -->
+              <div class="commentary-feed-list" id="commentary-feed-list">
+                <!-- Rendered dynamically by commentary.js -->
+              </div>
+            </div>
+
+            <!-- 2. Full Scorecard View -->
+            <div id="tab-view-scorecard" class="match-tab-pane" style="display:none;">
+              <div id="scorecard-content-area">
+                <!-- Rendered dynamically by scorecard.js -->
+              </div>
+            </div>
+
+            <!-- 3. Lineups View -->
+            <div id="tab-view-lineups" class="match-tab-pane" style="display:none;">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+
+            <!-- 4. Win Predictor & H2H View -->
+            <div id="tab-view-h2h" class="match-tab-pane" style="display:none;">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Sidebar: Matches List & Fan Live Chat / Polls -->
+      <aside class="sporets-sidebar" aria-label="Sidebar Feeds">
+        <!-- Matches Feed Panel -->
+        <div class="sidebar-panel-card">
+          <div class="sidebar-panel-header">
+            <h3>⚡ Live & Upcoming Matches</h3>
+          </div>
+          <div class="matches-list-scroll" id="matches-list-container">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </div>
+
+        <!-- Community Live Chat & Fan Poll Panel -->
+        <div class="sidebar-panel-card">
+          <div class="sidebar-panel-header">
+            <h3>💬 Fan Community & Live Reactions</h3>
+          </div>
+
+          <!-- Live Fan Match Poll -->
+          <div id="match-poll-container">
+            <!-- Rendered dynamically by chatAndPolls.js -->
+          </div>
+
+          <!-- Community Chat Feed -->
+          <div class="chat-container">
+            <div class="chat-messages-scroll" id="chat-messages-container">
+              <!-- Rendered dynamically by chatAndPolls.js -->
+            </div>
+
+            <form class="chat-input-bar" id="chat-input-form">
+              <input type="text" id="chat-text-input" placeholder="Join the discussion... cheering for?" autocomplete="off">
+              <button type="submit" class="chat-send-btn">Send ⚡</button>
+            </form>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data/sportsData.js"></script>
+  <script src="js/soundEffects.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/scorecard.js"></script>
+  <script src="js/commentary.js"></script>
+  <script src="js/chatAndPolls.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/annoyingMode.js"></script>
+</body>
+</html>
