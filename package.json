@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "description": "Sporets Live - Watch Live Sports, Scorecards of all Sports & Real-Time Commentary",
   "scripts": {
-    "dev": "powershell -ExecutionPolicy Bypass -File server.ps1 -Port 8080",
-    "start": "powershell -ExecutionPolicy Bypass -File server.ps1 -Port 8080"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "powershell -ExecutionPolicy Bypass -File server.ps1 -Port 8080",
+    "server": "powershell -ExecutionPolicy Bypass -File server.ps1 -Port 8080"
+  },
+  "dependencies": {
+    "vite": "^5.4.14"
+  },
+  "devDependencies": {
+    "vite": "^5.4.14"
   },
   "keywords": [
     "sports",
